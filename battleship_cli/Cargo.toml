@@ -1,0 +1,15 @@
+[package]
+name = "battleship_cli"
+version = "0.1.0"
+description = "simple cli game consuming the `battleship` library package."
+authors.workspace = true
+edition.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "battleship"
+path = "src/main.rs"
+
+[dependencies]
+battleship = { version = "0.1.0", path = "../battleship" }
