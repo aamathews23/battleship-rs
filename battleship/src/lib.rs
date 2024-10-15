@@ -4,4 +4,4 @@ mod direction;
 mod point;
 mod random;
 mod ship;
-mod shot;
+pub mod shot;

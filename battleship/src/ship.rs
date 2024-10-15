@@ -1,5 +1,3 @@
-use std::ops::Range;
-
 use crate::{
     direction::Direction,
     point::Point,
@@ -40,10 +38,10 @@ impl Ship {
         let e;
         match direction {
             Direction::Horizontal => {
-                e = Point::new( s.x + size_addon - 1, s.y);
+                e = Point::new( s.x + size_addon, s.y);
             }
             _ => {
-                e = Point::new(s.x, s.y + size_addon - 1);
+                e = Point::new(s.x, s.y + size_addon);
             }
         }
         Ship {
@@ -55,45 +53,16 @@ impl Ship {
         }
     }
 
-    fn check_hit(&self, input_range_val: u32, input_static_val: u32, ship_static_val: u32, range: Range<u32>) -> bool {
-        if input_static_val != ship_static_val {
-            return false;
-        }
-        for i in range {
-            if input_range_val == i {
-                return true;
-            }
-        }
-        false
-    }
-
-    pub fn hit(&mut self, x: u32, y: u32) -> bool {
-        let hit ;
-        match self.direction {
-            Direction::Horizontal => {
-                hit = self.check_hit(x, y, self.start.y, self.start.x..self.end.x);
-            },
-            Direction::Vertical => {
-                hit = self.check_hit(y, x, self.start.x, self.start.y..self.end.y);
-            }
-        }
-
-        if hit {
-            self.health -= 1;
-        }
-        hit
-    }
-
     pub fn place(&mut self, start: u32, end: u32) {
         self.direction = Direction::random(0, 1);
         let size_addon: u32 = self.size.into();
         self.start = Point::random(start, end - size_addon);
         match self.direction {
             Direction::Horizontal => {
-                self.end = Point::new( self.start.x + size_addon - 1, self.start.y);
+                self.end = Point::new( self.start.x + size_addon, self.start.y);
             }
             _ => {
-                self.end = Point::new(self.start.x, self.start.y + size_addon - 1);
+                self.end = Point::new(self.start.x, self.start.y + size_addon);
             }
         }
     }

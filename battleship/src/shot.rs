@@ -1,28 +1,6 @@
-use crate::{
-  cell::Cell,
-  ship::Ship,
-};
-
 #[derive(Debug)]
-pub enum Outcome {
+pub enum Shot {
     Hit,
     Miss,
     TryAgain
-}
-
-#[derive(Debug)]
-pub struct Result {
-    outcome: Outcome,
-    hits_and_misses: Vec<Vec<Cell>>,
-    ships: Vec<Ship>
-}
-
-impl Result {
-    pub fn new(outcome: Outcome, hits_and_misses: Vec<Vec<Cell>>, ships: Vec<Ship>) -> Result {
-        Result {
-            outcome,
-            hits_and_misses,
-            ships
-        }
-    }
 }

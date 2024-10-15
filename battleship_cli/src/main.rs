@@ -1,78 +1,32 @@
-use std::fmt;
-use battleship::{
-    board::Board,
-    cell::Cell
-};
+mod board_cli;
+mod cell_cli;
+mod shot_cli;
+
+use std::io::{stdin,stdout,Write};
+use battleship::board::Board;
+use board_cli::BoardCli;
 
 fn main() {
     let mut board_cli = BoardCli::new(Board::new(8));
     board_cli.board.start_game();
 
-    println!("{}", board_cli);
-
-    board_cli.board.shoot(0, 1);
-    println!("{}", board_cli);
-
-    board_cli.board.shoot(1, 1);
-    println!("{}", board_cli);
-
-    board_cli.board.shoot(1, 2);
-    println!("{}", board_cli);
-
-    board_cli.board.shoot(1, 3);
-    println!("{}", board_cli);
-
-    board_cli.board.shoot(1, 4);
-    println!("{}", board_cli);
-}
-
-struct CellCli {
-  cell: Cell
-}
-
-impl CellCli {
-  pub fn new(cell: Cell) -> CellCli {
-    CellCli {
-      cell
-    }
-  }
-}
-
-impl fmt::Display for CellCli {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let char = match self.cell {
-            Cell::Empty => " ",
-            Cell::Hit => "X",
-            Cell::Miss => "O"
-        };
-        write!(f, "{char}")
-    }
-}
-
-struct BoardCli {
-  board: Board
-}
-
-impl BoardCli {
-  pub fn new(board: Board) -> BoardCli {
-    BoardCli {
-      board
-    }
-  }
-}
-
-impl fmt::Display for BoardCli {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut board = "   0 1 2 3 4 5 6 7 \n-------------------".to_owned();
-        let mut count = 0;
-        for row in &self.board.hits_and_misses {
-            board.push_str(&format!("\n{} |", count));
-            for cell in row {
-                board.push_str(&CellCli::new(*cell).to_string());
-                board.push_str("|");
-            }
-            count += 1;
+    // TODO: track game stats
+    // TODO: change game board to be x-axis A - H
+    // TODO: change game board to be y-axis 1 - 8
+    // TODO: add error handling for invalid characters & digits
+    loop {
+        println!("{}", board_cli);
+        let mut s = String::new();
+        print!("\nWhere do you want to shoot? ");
+        let _ = stdout().flush();
+        stdin().read_line(&mut s).expect("Did not enter a correct string");
+        if let Some('\n') = s.chars().next_back() {
+            s.pop();
         }
-        write!(f, "{board}")
+        if let Some('\r') = s.chars().next_back() {
+            s.pop();
+        }
+        let coords: Vec<&str> = s.split(" ").collect();
+        println!("\n{}\n", board_cli.shoot(coords[0], coords[1]));
     }
 }
