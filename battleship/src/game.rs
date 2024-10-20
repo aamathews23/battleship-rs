@@ -4,7 +4,7 @@ use crate::{
         Ship,
         ShipSize
     },
-    shot::Shot
+    shoot_trait::ShootTrait
 };
 
 pub struct Game {
@@ -39,34 +39,6 @@ impl Game {
         self.board.init_board(size, &self.ships);
     }
 
-    pub fn shoot(&mut self, x: u32, y: u32) -> Shot {
-        self.amt_of_turns += 1;
-
-        let shot_res = self.board.shoot(x, y);
-
-        if shot_res == -2 {
-            self.amt_of_misses += 1;
-            return Shot::Miss;
-        }
-
-        self.amt_of_hits += 1;
-
-        if shot_res == -1 {
-            return Shot::Hit;
-        }
-
-        let ship = &mut self.ships[shot_res as usize];
-        ship.hit();
-
-        if ship.health == 0 {
-            self.ships_sunk += 1;
-
-            return Shot::Sunk;
-        }
-
-        return Shot::Hit;
-    }
-
     pub fn is_end(&self) -> bool {
         for ship in &self.ships {
             if ship.health > 0 {
@@ -75,5 +47,36 @@ impl Game {
         }
 
         true
+    }
+}
+
+impl ShootTrait for Game {
+    /// Determins if a ship was hit. Possible values: -1 = Miss, 0 = Hit, 1 = Ship sunk
+    fn shoot(&mut self, x: u32, y: u32) -> i32 {
+        self.amt_of_turns += 1;
+
+        let shot_res = self.board.shoot(x, y);
+
+        if shot_res == -2 {
+            self.amt_of_misses += 1;
+            return -1;
+        }
+
+        self.amt_of_hits += 1;
+
+        if shot_res == -1 {
+            return 0;
+        }
+
+        let ship = &mut self.ships[shot_res as usize];
+        ship.hit();
+
+        if ship.health == 0 {
+            self.ships_sunk += 1;
+
+            return 1;
+        }
+
+        return 0;
     }
 }

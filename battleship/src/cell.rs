@@ -1,20 +1,13 @@
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CellType {
-    Empty,
-    Hit,
-    Miss,
-    Ship
-}
-
-#[derive(Debug, Clone, Copy)]
 pub struct Cell {
-    pub cell_type: CellType,
+    /// The type of a cell. Possible values: -1 = miss, 0 = empty, 1 = ship, 2 = hit
+    pub cell_type: i32,
+    /// The index of the ship in the game's ship list
     pub ship_idx: usize
 }
 
 impl Cell {
-    pub fn new(cell_type: CellType, ship_idx: usize) -> Cell {
+    pub fn new(cell_type: i32, ship_idx: usize) -> Cell {
         Self {
             cell_type,
             ship_idx

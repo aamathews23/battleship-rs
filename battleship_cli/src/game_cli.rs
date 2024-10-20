@@ -1,14 +1,13 @@
-use battleship::game::Game;
+use battleship::{
+    game::Game,
+    shoot_trait::ShootTrait
+};
 use regex::Regex;
-use std::io::{
+use std::{env, io::{
     stdin,
     stdout,
     Write
-};
-use crate::{
-    cell_cli::CellCli,
-    shot_cli::ShotCli
-};
+}};
 
 pub enum GameInputValidationType {
     Coords(Vec<u32>),
@@ -65,7 +64,7 @@ impl GameCli {
 
     fn get_user_input() -> GameInputValidationType {
         let mut s = String::new();
-        let re = Regex::new(r"([A-H]|[a-h]) ([1-8])").unwrap();
+        let re = Regex::new(r"^([A-H]|[a-h])([1-8])$").unwrap();
         let _ = stdout().flush();
         stdin().read_line(&mut s).expect("Did not enter a correct string");
         if let Some('\n') = s.chars().next_back() {
@@ -84,11 +83,11 @@ impl GameCli {
         }
         
         if re.is_match(&s) {
-            let coords: Vec<&str> = s.split(" ").collect();
-            let x = coords[0]
+            let coords: Vec<&str> = s.split("").collect();
+            let x = coords[1]
                 .to_lowercase().chars().nth(0).expect("a character") as u32
                 - 97;
-            let y = coords[1]
+            let y = coords[2]
                 .chars().nth(0).expect("a digit")
                 .to_digit(10).expect("a valid digit")
                 - 1;
@@ -107,7 +106,17 @@ impl GameCli {
         for row in &self.game.board.cells {
             board.push_str(&format!("\n{} |", count));
             for cell in row {
-                board.push_str(&CellCli::new(*cell).to_string());
+                let cell_debug: bool = match env::var("CELL_DEBUG") {
+                    Ok(value) => if value == "1" { true } else { false },
+                    Err(_) => false
+                };
+                let cell_string = match cell.cell_type {
+                    -1 => "O",
+                    1 => if cell_debug { "S" } else { " " },
+                    2 => "X",
+                    _ => " "
+                };
+                board.push_str(cell_string);
                 board.push_str("|");
             }
             count += 1;
@@ -116,7 +125,11 @@ impl GameCli {
     }
 
     fn print_shot(&mut self, x: u32, y: u32) {
-        let shot = ShotCli::new(self.game.shoot(x, y));
+        let shot = match self.game.shoot(x, y) {
+            0 => "Hit.",
+            1 => "Ship sunk!",
+            _ => "Miss..."
+        };
         println!("{}", shot);
     }
 

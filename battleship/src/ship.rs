@@ -1,7 +1,4 @@
-use crate::{
-    direction::Direction,
-    random::Random
-};
+use crate::direction::Direction;
 
 #[derive(Debug, Clone, Copy)]
 pub enum ShipSize {
@@ -20,7 +17,6 @@ impl From<ShipSize> for u32 {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
 pub struct Ship {
     pub direction: Direction,
     pub size: ShipSize,

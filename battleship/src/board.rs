@@ -6,15 +6,12 @@ use rand::{
 };
 
 use crate::{
-    cell::{
-        Cell,
-        CellType
-    },
+    cell::Cell,
     direction::Direction,
-    ship::Ship
+    ship::Ship,
+    shoot_trait::ShootTrait
 };
 
-#[derive(Debug)]
 pub struct Board {
     pub size: u32,
     pub cells: Vec<Vec<Cell>>
@@ -38,7 +35,7 @@ impl Board {
         (0..self.size as usize).for_each(|i| {
             self.cells.push(Vec::new());
             (0..self.size as usize).for_each(|_j| {
-                let cell = Cell::new(CellType::Empty, usize::MAX);
+                let cell = Cell::new(0, usize::MAX);
                 self.cells[i].push(cell);
             });
         });
@@ -46,8 +43,8 @@ impl Board {
 
     fn init_ships_on_board(&mut self, ships: &Vec<Ship>) {
         for i in 0..ships.len() {
-            let ship = ships[i];
-            let direction = ship.direction;
+            let ship = &ships[i];
+            let direction = &ship.direction;
             let ship_size: u32 = ship.size.into();
             let mut s = self.get_random_index();
             let mut e = s + ship_size;
@@ -63,14 +60,14 @@ impl Board {
                 Direction::Horizontal => {
                     for x in s..e {
                         let cell = &mut self.cells[static_idx as usize][x as usize];
-                        cell.cell_type = CellType::Ship;
+                        cell.cell_type = 1;
                         cell.ship_idx = i;
                     }
                 },
                 Direction::Vertical => {
                     for y in s..e {
                         let cell = &mut self.cells[y as usize][static_idx as usize];
-                        cell.cell_type = CellType::Ship;
+                        cell.cell_type = 1;
                         cell.ship_idx = i;
                     }
                 }
@@ -88,7 +85,7 @@ impl Board {
         idx
     }
 
-    fn is_ship_valid(&self, direction: Direction, s: u32, e: u32, static_idx: u32) -> bool {
+    fn is_ship_valid(&self, direction: &Direction, s: u32, e: u32, static_idx: u32) -> bool {
         if e > self.size - 1 {
             return false;
         }
@@ -96,14 +93,14 @@ impl Board {
         match direction {
             Direction::Horizontal => {
                 for i in s..e {
-                    if self.cells[static_idx as usize][i as usize].cell_type == CellType::Ship {
+                    if self.cells[static_idx as usize][i as usize].cell_type == 1 {
                         return false;
                     }
                 }
             },
             Direction::Vertical => {
                 for i in s..e {
-                    if self.cells[i as usize][static_idx as usize].cell_type == CellType::Ship {
+                    if self.cells[i as usize][static_idx as usize].cell_type == 1 {
                         return false;
                     }
                 }
@@ -112,20 +109,23 @@ impl Board {
 
         true
     }
+}
 
-    pub fn shoot(&mut self, x: u32, y: u32) -> i32 {
+impl ShootTrait for Board {
+    /// Determines the result of a shot from the user. Possible values: -2 = Miss, -1 = Repeat hit, > -1 = ship index
+    fn shoot(&mut self, x: u32, y: u32) -> i32 {
         let cell = &mut self.cells[y as usize][x as usize];
 
-        if cell.cell_type == CellType::Ship {
-            cell.cell_type = CellType::Hit;
+        if cell.cell_type == 1 {
+            cell.cell_type = 2;
             return cell.ship_idx as i32;
         }
 
-        if cell.cell_type == CellType::Hit {
+        if cell.cell_type == 2 {
             return -1;
         }
 
-        cell.cell_type = CellType::Miss;
+        cell.cell_type = -1;
         -2
     }
 }
