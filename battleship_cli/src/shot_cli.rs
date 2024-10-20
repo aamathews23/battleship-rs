@@ -16,9 +16,9 @@ impl ShotCli {
 impl fmt::Display for ShotCli {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let char = match self.shot {
-            Shot::Hit => "Hit!",
+            Shot::Hit => "Hit.",
             Shot::Miss => "Miss...",
-            Shot::TryAgain => "Try again."
+            Shot::Sunk => "Ship sunk!"
         };
         write!(f, "{char}")
     }

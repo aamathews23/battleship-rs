@@ -2,5 +2,5 @@
 pub enum Shot {
     Hit,
     Miss,
-    TryAgain
+    Sunk
 }

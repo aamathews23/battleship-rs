@@ -13,3 +13,5 @@ path = "src/main.rs"
 
 [dependencies]
 battleship = { version = "0.1.0", path = "../battleship" }
+dotenv = "0.15.0"
+regex = "1.11.0"

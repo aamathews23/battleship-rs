@@ -1,88 +1,109 @@
+use std::usize;
+
+use rand::{
+    seq::IteratorRandom,
+    thread_rng
+};
+
 use crate::{
-    cell::Cell, direction::Direction, ship::{
-        Ship,
-        ShipSize
+    cell::{
+        Cell,
+        CellType
     },
-    shot::Shot
+    direction::Direction,
+    ship::Ship
 };
 
 #[derive(Debug)]
 pub struct Board {
     pub size: u32,
-    pub cells: Vec<Vec<Cell>>,
-    pub ships: Vec<Ship>
+    pub cells: Vec<Vec<Cell>>
 }
 
 impl Board {
-    pub fn new(size: u32) -> Board {
-        let cells: Vec<Vec<Cell>> = Vec::new();
-        let ships: Vec<Ship> = Vec::new();
+    pub fn new() -> Board {
         Board {
-            size,
-            cells,
-            ships
+            size: 0,
+            cells: Vec::new()
         }
     }
 
-    pub fn start_game(&mut self) {
+    pub fn init_board(&mut self, size: u32, ships: &Vec<Ship>) {
+        self.size = size;
+        self.init_empty_board();
+        self.init_ships_on_board(ships);
+    }
+
+    fn init_empty_board(&mut self) {
         (0..self.size as usize).for_each(|i| {
             self.cells.push(Vec::new());
             (0..self.size as usize).for_each(|_j| {
-                self.cells[i].push(Cell::Empty);
+                let cell = Cell::new(CellType::Empty, usize::MAX);
+                self.cells[i].push(cell);
             });
         });
-
-        let destoryer = self.place_ship(ShipSize::Destroyer);
-        let cruiser = self.place_ship(ShipSize::Cruiser);
-        let battleship = self.place_ship(ShipSize::Battleship);
-
-        self.ships.push(destoryer);
-        self.ships.push(cruiser);
-        self.ships.push(battleship);
     }
 
-    pub fn shoot(&mut self, x: u32, y: u32) -> Shot {
-        if x > self.size - 1 || y > self.size - 1 {
-            return Shot::TryAgain;
-        }
+    fn init_ships_on_board(&mut self, ships: &Vec<Ship>) {
+        for i in 0..ships.len() {
+            let ship = ships[i];
+            let direction = ship.direction;
+            let ship_size: u32 = ship.size.into();
+            let mut s = self.get_random_index();
+            let mut e = s + ship_size;
+            let mut static_idx = self.get_random_index();
 
-        if self.cells[y as usize][x as usize] == Cell::Ship {
-            self.cells[y as usize][x as usize] = Cell::Hit;
-            return Shot::Hit;
-        }
+            while !self.is_ship_valid(direction, s, e, static_idx) {
+                s = self.get_random_index();
+                e = s + ship_size;
+                static_idx = self.get_random_index();
+            }
 
-        self.cells[y as usize][x as usize] = Cell::Miss;
-        Shot::Miss
+            match direction {
+                Direction::Horizontal => {
+                    for x in s..e {
+                        let cell = &mut self.cells[static_idx as usize][x as usize];
+                        cell.cell_type = CellType::Ship;
+                        cell.ship_idx = i;
+                    }
+                },
+                Direction::Vertical => {
+                    for y in s..e {
+                        let cell = &mut self.cells[y as usize][static_idx as usize];
+                        cell.cell_type = CellType::Ship;
+                        cell.ship_idx = i;
+                    }
+                }
+            }
+        }
     }
 
-    fn valid_ship(&self, ship: Ship) -> bool {
-        let range;
-        let static_axis;
-
-        match ship.direction {
-            Direction::Horizontal => {
-                range = ship.start.x..ship.end.x;
-                static_axis = ship.start.y as usize;
-            },
-            Direction::Vertical => {
-                range = ship.start.y..ship.end.y;
-                static_axis = ship.start.x as usize;
-            },
+    fn get_random_index(&self) -> u32 {
+        let choices = 0..self.size;
+        let mut rng = thread_rng();
+        let idx = match choices.choose(&mut rng) {
+            Some(num) => num,
+            _ => 0
         };
+        idx
+    }
 
-        match ship.direction {
+    fn is_ship_valid(&self, direction: Direction, s: u32, e: u32, static_idx: u32) -> bool {
+        if e > self.size - 1 {
+            return false;
+        }
+
+        match direction {
             Direction::Horizontal => {
-                for i in range {
-                    println!("({static_axis}, {i})");
-                    if self.cells[static_axis][i as usize] == Cell::Ship {
+                for i in s..e {
+                    if self.cells[static_idx as usize][i as usize].cell_type == CellType::Ship {
                         return false;
                     }
                 }
             },
             Direction::Vertical => {
-                for i in range {
-                    println!("({i}, {static_axis})");
-                    if self.cells[i as usize][static_axis] == Cell::Ship {
+                for i in s..e {
+                    if self.cells[i as usize][static_idx as usize].cell_type == CellType::Ship {
                         return false;
                     }
                 }
@@ -92,26 +113,19 @@ impl Board {
         true
     }
 
-    fn place_ship(&mut self, ship_size: ShipSize) -> Ship {
-        let mut ship = Ship::new(0, self.size - 1, ship_size);
+    pub fn shoot(&mut self, x: u32, y: u32) -> i32 {
+        let cell = &mut self.cells[y as usize][x as usize];
 
-        while !self.valid_ship(ship) {
-            ship.place(0, self.size - 1);
+        if cell.cell_type == CellType::Ship {
+            cell.cell_type = CellType::Hit;
+            return cell.ship_idx as i32;
         }
 
-        match ship.direction {
-            Direction::Horizontal => {
-                (ship.start.x..ship.end.x).for_each(|x| {
-                    self.cells[ship.start.y as usize][x as usize] = Cell::Ship;
-                });
-            },
-            Direction::Vertical => {
-                (ship.start.y..ship.end.y).for_each(|y| {
-                    self.cells[y as usize][ship.start.x as usize] = Cell::Ship;
-                });
-            }
+        if cell.cell_type == CellType::Hit {
+            return -1;
         }
 
-        ship
+        cell.cell_type = CellType::Miss;
+        -2
     }
 }
