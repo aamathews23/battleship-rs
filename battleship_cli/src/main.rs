@@ -10,7 +10,6 @@ use battleship::{
 mod game_cli;
 
 fn main() {
-    // TODO: Add unit tests for ShipYard
     // TODO: Abstract RandomGenerator as a trait and RandomGeneratorImpl
     // TODO: Add integration tests for battleship pkg
     // TODO: Add unit tests for CLI funcs
