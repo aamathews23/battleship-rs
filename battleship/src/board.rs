@@ -1,37 +1,35 @@
 use std::usize;
 
-use rand::{
-    seq::IteratorRandom,
-    thread_rng
-};
-
 use crate::{
     cell::Cell,
     direction::Direction,
+    random_generator::RandomGenerator,
     ship::Ship,
     shoot_trait::ShootTrait
 };
 
 pub struct Board {
-    pub size: u32,
+    pub size: i32,
     pub cells: Vec<Vec<Cell>>
 }
 
 impl Board {
-    pub fn new() -> Board {
-        Board {
-            size: 0,
+    pub fn new(size: i32) -> Self {
+        if size <= 0 {
+            panic!("Uh oh! Please provide a board size greater than 0.");
+        }
+
+        Self {
+            size,
             cells: Vec::new()
         }
     }
 
-    pub fn init_board(&mut self, size: u32, ships: &Vec<Ship>) {
-        self.size = size;
-        self.init_empty_board();
-        self.init_ships_on_board(ships);
-    }
+    pub fn init_board(&mut self, ships: &Vec<Ship>, generator: &mut dyn RandomGenerator) {
+        if ships.len() == 0 {
+            panic!("Uh oh! Please provide at least one ship.");
+        }
 
-    fn init_empty_board(&mut self) {
         (0..self.size as usize).for_each(|i| {
             self.cells.push(Vec::new());
             (0..self.size as usize).for_each(|_j| {
@@ -39,21 +37,19 @@ impl Board {
                 self.cells[i].push(cell);
             });
         });
-    }
 
-    fn init_ships_on_board(&mut self, ships: &Vec<Ship>) {
         for i in 0..ships.len() {
             let ship = &ships[i];
             let direction = &ship.direction;
-            let ship_size: u32 = ship.size.into();
-            let mut s = self.get_random_index();
+            let ship_size: i32 = ship.size.into();
+            let mut s = generator.generate(0, self.size);
             let mut e = s + ship_size;
-            let mut static_idx = self.get_random_index();
+            let mut static_idx = generator.generate(0, self.size);
 
-            while !self.is_ship_valid(direction, s, e, static_idx) {
-                s = self.get_random_index();
+            while !Board::is_ship_valid(&self, direction, s, e, static_idx) {
+                s = generator.generate(0, self.size);
                 e = s + ship_size;
-                static_idx = self.get_random_index();
+                static_idx = generator.generate(0, self.size);
             }
 
             match direction {
@@ -75,32 +71,22 @@ impl Board {
         }
     }
 
-    fn get_random_index(&self) -> u32 {
-        let choices = 0..self.size;
-        let mut rng = thread_rng();
-        let idx = match choices.choose(&mut rng) {
-            Some(num) => num,
-            _ => 0
-        };
-        idx
-    }
-
-    fn is_ship_valid(&self, direction: &Direction, s: u32, e: u32, static_idx: u32) -> bool {
-        if e > self.size - 1 {
+    fn is_ship_valid(board: &Self, direction: &Direction, s: i32, e: i32, static_idx: i32) -> bool {
+        if e > board.size - 1 {
             return false;
         }
 
         match direction {
             Direction::Horizontal => {
                 for i in s..e {
-                    if self.cells[static_idx as usize][i as usize].cell_type == 1 {
+                    if board.cells[static_idx as usize][i as usize].cell_type == 1 {
                         return false;
                     }
                 }
             },
             Direction::Vertical => {
                 for i in s..e {
-                    if self.cells[i as usize][static_idx as usize].cell_type == 1 {
+                    if board.cells[i as usize][static_idx as usize].cell_type == 1 {
                         return false;
                     }
                 }
@@ -113,7 +99,7 @@ impl Board {
 
 impl ShootTrait for Board {
     /// Determines the result of a shot from the user. Possible values: -2 = Miss, -1 = Repeat hit, > -1 = ship index
-    fn shoot(&mut self, x: u32, y: u32) -> i32 {
+    fn shoot(&mut self, x: i32, y: i32) -> i32 {
         let cell = &mut self.cells[y as usize][x as usize];
 
         if cell.cell_type == 1 {
@@ -127,5 +113,95 @@ impl ShootTrait for Board {
 
         cell.cell_type = -1;
         -2
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        random_generator::MockRandomGenerator,
+        ship::ShipSize
+    };
+
+    use super::*;
+
+    fn init_board_helper(size: i32, has_ship: bool) -> Board {
+        let mut mock = MockRandomGenerator::new();
+        mock.expect_generate()
+            .returning(|_s, _e| 0);
+
+        let mut ships = Vec::new();
+
+        if has_ship {
+            let destoryer = Ship::new(ShipSize::Destroyer);
+            ships.push(destoryer);
+        }
+
+        let mut board = Board::new(size);
+        board.init_board(&ships, &mut mock);
+
+        board
+    }
+
+    #[test]
+    fn test_new() {
+        let board = Board::new(8);
+        assert_eq!(board.size, 8);
+        assert_eq!(board.cells.len(), 0);
+    }
+
+    #[test]
+    #[should_panic(expected = "Uh oh! Please provide a board size greater than 0.")]
+    fn test_new_size_zero() {
+        Board::new(0);
+    }
+
+    #[test]
+    fn test_init_board() {
+        let board = init_board_helper(8, true);
+
+        assert_eq!(board.cells[0][0].cell_type, 1);
+    }
+
+    #[test]
+    #[should_panic(expected = "Uh oh! Please provide at least one ship.")]
+    fn test_init_board_no_ships() {
+        init_board_helper(8, false);
+    }
+
+    #[test]
+    fn test_is_ship_valid_success() {
+        let board = init_board_helper(8, true);
+        let is_valid = Board::is_ship_valid(&board, &Direction::Horizontal, 1, 1, 0);
+        assert!(is_valid);
+    }
+
+    #[test]
+    fn test_is_ship_valid_failure() {
+        let board = init_board_helper(8, true);
+        let is_valid = Board::is_ship_valid(&board,&Direction::Horizontal, 0, 1, 0);
+        assert!(!is_valid);
+    }
+
+    #[test]
+    fn test_shoot_hit() {
+        let mut board = init_board_helper(8, true);
+        let hit_result = board.shoot(0, 0);
+        assert_eq!(hit_result, 0);
+    }
+
+    #[test]
+    fn test_shoot_repeat_hit() {
+        let mut board = init_board_helper(8, true);
+        board.shoot(0, 0);
+        let hit_result = board.shoot(0, 0);
+        assert_eq!(hit_result, -1);
+    }
+
+    #[test]
+    fn test_shoot_repeat_miss() {
+        let mut board = init_board_helper(8, true);
+        let hit_result = board.shoot(0, 1);
+        assert_eq!(hit_result, -2);
     }
 }

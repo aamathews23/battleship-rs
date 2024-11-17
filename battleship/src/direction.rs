@@ -1,23 +1,42 @@
-use rand::{seq::SliceRandom, thread_rng};
+use crate::random_generator::RandomGenerator;
 
+#[derive(Debug, PartialEq)]
 pub enum Direction {
     Horizontal,
     Vertical
 }
 
 impl Direction {
-    pub fn random(start: u32, end: u32) -> Direction {
-        let choices = [start, end];
-        let mut rng = thread_rng();
-        let direction = match choices.choose(&mut rng) {
-            Some(num) => *num,
-            _ => 0
-        };
+    pub fn random(generator: &mut dyn RandomGenerator) -> Direction {
+        let direction = generator.generate(0, 1);
         
         if direction == 0 {
             return Direction::Horizontal;
         } else {
             return Direction::Vertical;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::random_generator::MockRandomGenerator;
+
+    use super::*;
+
+    #[test]
+    fn test_horizontal() {
+        let mut mock = MockRandomGenerator::new();
+        mock.expect_generate().returning(|_s, _e| 0);
+
+        assert_eq!(Direction::random(&mut mock), Direction::Horizontal);
+    }
+
+    #[test]
+    fn test_vertical() {
+        let mut mock = MockRandomGenerator::new();
+        mock.expect_generate().returning(|_s, _e| 1);
+
+        assert_eq!(Direction::random(&mut mock), Direction::Vertical);
     }
 }

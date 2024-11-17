@@ -14,3 +14,15 @@ impl Cell {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let cell = Cell::new(-1, 2);
+        assert_eq!(cell.cell_type, -1);
+        assert_eq!(cell.ship_idx, 2);
+    }
+}
