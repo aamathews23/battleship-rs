@@ -1,7 +1,8 @@
 mod board;
 mod cell;
 mod direction;
-pub mod ship;
+mod ship_yard;
+mod ship;
 pub mod random_generator;
 pub mod game;
 pub mod shoot_trait;

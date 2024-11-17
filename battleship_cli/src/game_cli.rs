@@ -1,9 +1,5 @@
 use battleship::{
     game::Game,
-    ship::{
-        Ship,
-        ShipSize
-    },
     random_generator::RandomGenerator,
     game_trait::GameTrait,
     shoot_trait::ShootTrait
@@ -28,15 +24,12 @@ pub struct GameCli {
 
 impl GameCli {
     pub fn new() -> Self {
-        let mut ships = Vec::new();
-        let destoryer = Ship::new(ShipSize::Destroyer);
-        let cruiser = Ship::new(ShipSize::Cruiser);
-        let battleship = Ship::new(ShipSize::Battleship);
-        ships.push(destoryer);
-        ships.push(cruiser);
-        ships.push(battleship);
+        let mut game = Game::new(8);
+        game.add_destroyer();
+        game.add_cruiser();
+        game.add_battleship();
         Self {
-            game: Game::new(8, ships)
+            game
         }
     }
 

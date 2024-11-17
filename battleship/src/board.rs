@@ -4,7 +4,7 @@ use crate::{
     cell::Cell,
     direction::Direction,
     random_generator::RandomGenerator,
-    ship::Ship,
+    ship_yard::ShipYard,
     shoot_trait::ShootTrait
 };
 
@@ -25,11 +25,7 @@ impl Board {
         }
     }
 
-    pub fn init_board(&mut self, ships: &Vec<Ship>, generator: &mut dyn RandomGenerator) {
-        if ships.len() == 0 {
-            panic!("Uh oh! Please provide at least one ship.");
-        }
-
+    pub fn init_board(&mut self, ship_yard: &mut ShipYard, generator: &mut dyn RandomGenerator) {
         (0..self.size as usize).for_each(|i| {
             self.cells.push(Vec::new());
             (0..self.size as usize).for_each(|_j| {
@@ -38,8 +34,8 @@ impl Board {
             });
         });
 
-        for i in 0..ships.len() {
-            let ship = &ships[i];
+        for i in 0..ship_yard.get_yard_size() {
+            let ship = ship_yard.get_ship(i);
             let direction = &ship.direction;
             let ship_size: i32 = ship.size.into();
             let mut s = generator.generate(0, self.size);
@@ -118,27 +114,23 @@ impl ShootTrait for Board {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        random_generator::MockRandomGenerator,
-        ship::ShipSize
-    };
+    use crate::random_generator::MockRandomGenerator;
 
     use super::*;
 
     fn init_board_helper(size: i32, has_ship: bool) -> Board {
+        let mut ship_yard = ShipYard::new();
+        
         let mut mock = MockRandomGenerator::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
-        let mut ships = Vec::new();
-
         if has_ship {
-            let destoryer = Ship::new(ShipSize::Destroyer);
-            ships.push(destoryer);
+            ship_yard.build_destroyer();
         }
 
         let mut board = Board::new(size);
-        board.init_board(&ships, &mut mock);
+        board.init_board(&mut ship_yard, &mut mock);
 
         board
     }
@@ -161,12 +153,6 @@ mod tests {
         let board = init_board_helper(8, true);
 
         assert_eq!(board.cells[0][0].cell_type, 1);
-    }
-
-    #[test]
-    #[should_panic(expected = "Uh oh! Please provide at least one ship.")]
-    fn test_init_board_no_ships() {
-        init_board_helper(8, false);
     }
 
     #[test]
