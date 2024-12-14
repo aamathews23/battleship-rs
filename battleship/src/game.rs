@@ -23,7 +23,7 @@ impl Game {
             amt_of_misses: 0,
             ships_sunk: 0,
             board: Board::new(size),
-            ship_yard: ShipYard::new()
+            ship_yard: ShipYard::new(3)
         }
     }
 
@@ -62,7 +62,7 @@ impl ShootTrait for Game {
 
         self.amt_of_hits += 1;
 
-        let ship = &mut self.ship_yard.get_ship(shot_res as usize);
+        let ship = &mut self.ship_yard.get_ship(shot_res as usize).expect("a ship to be present in the ship yard");
         ship.hit();
 
         if ship.health == 0 {

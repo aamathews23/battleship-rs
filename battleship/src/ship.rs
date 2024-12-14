@@ -1,6 +1,7 @@
 use crate::direction::Direction;
 use crate::random_generator::RandomGeneratorImpl;
 
+#[derive(Debug, PartialEq)]
 pub struct Ship {
     pub direction: Direction,
     pub size: i32,

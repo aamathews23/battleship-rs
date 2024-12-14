@@ -35,7 +35,7 @@ impl Board {
         });
 
         for i in 0..ship_yard.get_yard_size() {
-            let ship = ship_yard.get_ship(i);
+            let ship = ship_yard.get_ship(i).expect("a ship to be present in the ship yard");
             let direction = &ship.direction;
             let ship_size: i32 = ship.size.into();
             let mut s = generator.generate(0, self.size);
@@ -119,7 +119,7 @@ mod tests {
     use super::*;
 
     fn init_board_helper(size: i32, has_ship: bool) -> Board {
-        let mut ship_yard = ShipYard::new();
+        let mut ship_yard = ShipYard::new(3);
         
         let mut mock = MockRandomGenerator::new();
         mock.expect_generate()
