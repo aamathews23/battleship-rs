@@ -1,7 +1,8 @@
 use crate::{
     board::Board,
     game_trait::GameTrait,
-    random_generator::RandomGenerator,
+    random_generator::RandomGeneratorImpl,
+    random_generator_trait::RandomGeneratorTrait,
     ship_yard::ShipYard,
     shoot_trait::ShootTrait
 };
@@ -42,10 +43,18 @@ impl Game {
     pub fn is_end(&self) -> bool {
         self.ship_yard.are_all_ships_sunk()
     }
+
+    fn sg(&mut self, generator: &mut dyn RandomGeneratorTrait) {
+        if !self.ship_yard.has_ships() {
+            panic!("Uh oh! Please provide at least one ship.");
+        }
+
+        self.board.init_board(&mut self.ship_yard, generator);
+    }
 }
 
 impl ShootTrait for Game {
-    /// Determins if a ship was hit. Possible values: -1 = Miss, 0 = Hit, 1 = Ship sunk
+    /// Determines if a ship was hit. Possible values: -1 = Miss, 0 = Hit, 1 = Ship sunk
     fn shoot(&mut self, x: i32, y: i32) -> i32 {
         self.amt_of_turns += 1;
 
@@ -76,18 +85,15 @@ impl ShootTrait for Game {
 }
 
 impl GameTrait for Game {
-    fn start_game(&mut self, generator: &mut dyn RandomGenerator) {
-        if !self.ship_yard.has_ships() {
-            panic!("Uh oh! Please provide at least one ship.");
-        }
-
-        self.board.init_board(&mut self.ship_yard, generator);
+    fn start_game(&mut self) {
+        let mut generator = RandomGeneratorImpl::new();
+        self.sg(&mut generator);
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::random_generator::MockRandomGenerator;
+    use crate::random_generator_trait::MockRandomGeneratorTrait;
 
     use super::*;
 
@@ -111,13 +117,13 @@ mod tests {
 
     #[test]
     fn test_start_game() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
         let mut game = init_game_helper();
 
-        game.start_game(&mut mock);
+        game.sg(&mut mock);
 
         assert_eq!(game.amt_of_hits, 0);
         assert_eq!(game.amt_of_misses, 0);
@@ -130,24 +136,26 @@ mod tests {
     #[test]
     #[should_panic(expected = "Uh oh! Please provide at least one ship.")]
     fn test_start_game_no_ships_failure() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
         let mut game = Game::new(8);
 
-        game.start_game(&mut mock);
+        game.sg(&mut mock);
+
     }
 
     #[test]
     fn test_shoot_hit() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
         let mut game = init_game_helper();
 
-        game.start_game(&mut mock);
+        game.sg(&mut mock);
+
         game.shoot(0, 0);
 
         assert_eq!(game.amt_of_hits, 1);
@@ -159,13 +167,14 @@ mod tests {
 
     #[test]
     fn test_shoot_repeat_hit() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
         let mut game = init_game_helper();
 
-        game.start_game(&mut mock);
+        game.sg(&mut mock);
+
         game.shoot(0, 0);
         game.shoot(0, 0);
 
@@ -178,13 +187,14 @@ mod tests {
 
     #[test]
     fn test_shoot_sink() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
         let mut game = init_game_helper();
 
-        game.start_game(&mut mock);
+        game.sg(&mut mock);
+
         game.shoot(0, 0);
         game.shoot(1, 0);
 
@@ -198,13 +208,14 @@ mod tests {
 
     #[test]
     fn test_shoot_miss() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
         let mut game = init_game_helper();
 
-        game.start_game(&mut mock);
+        game.sg(&mut mock);
+
         game.shoot(0, 1);
 
         assert_eq!(game.amt_of_hits, 0);
@@ -224,24 +235,26 @@ mod tests {
 
     #[test]
     fn test_is_end_after_start_game() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
         let mut game = init_game_helper();
-        game.start_game(&mut mock);
+        game.sg(&mut mock);
+
 
         assert_eq!(game.is_end(), false);
     }
 
     #[test]
     fn test_is_end_after_one_hit() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
         let mut game = init_game_helper();
-        game.start_game(&mut mock);
+        game.sg(&mut mock);
+
         game.shoot(0, 0);
 
         assert_eq!(game.is_end(), false);
@@ -249,12 +262,13 @@ mod tests {
 
     #[test]
     fn test_is_end_after_sink() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 
         let mut game = init_game_helper();
-        game.start_game(&mut mock);
+        game.sg(&mut mock);
+
         game.shoot(0, 0);
         game.shoot(1, 0);
 

@@ -3,7 +3,7 @@ use std::usize;
 use crate::{
     cell::Cell,
     direction::Direction,
-    random_generator::RandomGenerator,
+    random_generator_trait::RandomGeneratorTrait,
     ship_yard::ShipYard,
     shoot_trait::ShootTrait
 };
@@ -25,7 +25,7 @@ impl Board {
         }
     }
 
-    pub fn init_board(&mut self, ship_yard: &mut ShipYard, generator: &mut dyn RandomGenerator) {
+    pub fn init_board(&mut self, ship_yard: &mut ShipYard, generator: &mut dyn RandomGeneratorTrait) {
         (0..self.size as usize).for_each(|i| {
             self.cells.push(Vec::new());
             (0..self.size as usize).for_each(|_j| {
@@ -114,14 +114,14 @@ impl ShootTrait for Board {
 
 #[cfg(test)]
 mod tests {
-    use crate::random_generator::MockRandomGenerator;
+    use crate::random_generator_trait::MockRandomGeneratorTrait;
 
     use super::*;
 
     fn init_board_helper(size: i32, has_ship: bool) -> Board {
         let mut ship_yard = ShipYard::new(3);
         
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate()
             .returning(|_s, _e| 0);
 

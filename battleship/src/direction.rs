@@ -1,4 +1,4 @@
-use crate::random_generator::RandomGenerator;
+use crate::random_generator_trait::RandomGeneratorTrait;
 
 #[derive(Debug, PartialEq)]
 pub enum Direction {
@@ -7,7 +7,7 @@ pub enum Direction {
 }
 
 impl Direction {
-    pub fn random(generator: &mut dyn RandomGenerator) -> Direction {
+    pub fn random(generator: &mut dyn RandomGeneratorTrait) -> Direction {
         let direction = generator.generate(0, 1);
         
         if direction == 0 {
@@ -20,13 +20,13 @@ impl Direction {
 
 #[cfg(test)]
 mod tests {
-    use crate::random_generator::MockRandomGenerator;
+    use crate::random_generator_trait::MockRandomGeneratorTrait;
 
     use super::*;
 
     #[test]
     fn test_horizontal() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate().returning(|_s, _e| 0);
 
         assert_eq!(Direction::random(&mut mock), Direction::Horizontal);
@@ -34,7 +34,7 @@ mod tests {
 
     #[test]
     fn test_vertical() {
-        let mut mock = MockRandomGenerator::new();
+        let mut mock = MockRandomGeneratorTrait::new();
         mock.expect_generate().returning(|_s, _e| 1);
 
         assert_eq!(Direction::random(&mut mock), Direction::Vertical);

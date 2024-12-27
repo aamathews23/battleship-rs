@@ -1,6 +1,5 @@
 use battleship::{
     game::Game,
-    random_generator::RandomGenerator,
     game_trait::GameTrait,
     shoot_trait::ShootTrait
 };
@@ -113,8 +112,7 @@ impl GameCli {
 }
 
 impl GameTrait for GameCli {
-    fn start_game(&mut self, generator: &mut dyn RandomGenerator) {
-        self.game.start_game(generator);
+    fn start_game(&mut self) {
         loop {
             self.print_board();
             print!("\nWhere do you want to shoot? ");

@@ -1,28 +1,24 @@
-use mockall::automock;
 use rand::{
     rngs::ThreadRng,
     seq::SliceRandom,
     thread_rng
 };
 
-#[automock]
-pub trait RandomGenerator {
-    fn generate(&mut self, start: i32, end: i32) -> i32;
-}
+use crate::random_generator_trait::RandomGeneratorTrait;
 
 pub struct RandomGeneratorImpl {
     rng: ThreadRng
 }
 
 impl RandomGeneratorImpl {
-    pub fn new() -> Self {
+    pub fn new() -> impl RandomGeneratorTrait {
         Self {
             rng: thread_rng()
         }
     }
 }
 
-impl RandomGenerator for RandomGeneratorImpl {
+impl RandomGeneratorTrait for RandomGeneratorImpl {
     fn generate(&mut self, start: i32, end: i32) -> i32 {
         let choices: Vec<i32> = (start..end).collect();
         let choice = match choices.choose(&mut self.rng) {
