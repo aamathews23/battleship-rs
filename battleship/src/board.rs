@@ -35,7 +35,7 @@ impl Board {
         });
 
         for i in 0..ship_yard.get_yard_size() {
-            let ship = ship_yard.get_ship(i).expect("a ship to be present in the ship yard");
+            let ship = ship_yard.get_ship(i);
             let direction = &ship.direction;
             let ship_size: i32 = ship.size.into();
             let mut s = generator.generate(0, self.size);

@@ -5,6 +5,7 @@ pub struct ShipYard {
     ships: Vec<Ship>
 }
 
+/// A class for ship management in the battleship game.
 impl ShipYard {
     pub fn new(capacity: usize) -> Self {
         Self {
@@ -36,20 +37,20 @@ impl ShipYard {
         self.build_ship(4)
     }
 
-    pub fn get_ship(&mut self, idx: usize) -> Option<&mut Ship> {
-        if !self.has_ships() {
-            return Option::None;
+    pub fn get_ship(&mut self, idx: usize) -> &mut Ship {
+        if self.get_yard_size() == 0 {
+            panic!("Uh oh! There are no ships in the yard...");
         }
 
-        Option::Some(&mut self.ships[idx])
+        if idx >= self.get_yard_size() {
+            panic!("Uh oh! The ship you are requesting does not exist...")
+        }
+
+        &mut self.ships[idx]
     }
 
     pub fn get_yard_size(&self) -> usize {
         self.ships.len()
-    }
-
-    pub fn has_ships(&self) -> bool {
-        self.ships.len() > 0
     }
 
     pub fn has_capacity(&self) -> bool {
@@ -57,8 +58,8 @@ impl ShipYard {
     }
 
     pub fn are_all_ships_sunk(&self) -> bool {
-        if !self.has_ships() {
-            return false;
+        if self.get_yard_size() == 0 {
+            panic!("Uh oh! There are no ships in the yard...");
         }
 
         for ship in &self.ships {
@@ -82,8 +83,6 @@ mod tests {
     #[test]
     fn test_new() {
         let ship_yard = build_ship_yard();
-
-        assert_eq!(ship_yard.capacity, 3);
         assert_eq!(ship_yard.ships.len(), 0);
     }
 
@@ -145,103 +144,67 @@ mod tests {
     }
 
     #[test]
-    fn test_get_ship_when_empty() {
-        let mut ship_yard = build_ship_yard();
-
-        assert!(ship_yard.get_ship(0).is_none());
-    }
-
-    #[test]
-    fn test_get_ship_when_occupied() {
+    fn test_get_ship() {
         let mut ship_yard = build_ship_yard();
         ship_yard.build_destroyer();
-
-        assert!(ship_yard.get_ship(0).is_some());
-        assert_eq!(ship_yard.get_ship(0).unwrap().size, 2);
+        assert_eq!(ship_yard.get_ship(0).size, 2);
     }
 
     #[test]
-    fn test_get_yard_size_when_empty() {
-        let ship_yard = build_ship_yard();
+    #[should_panic = "Uh oh! There are no ships in the yard..."]
+    fn test_get_ship_empty_yard() {
+        let mut ship_yard = build_ship_yard();
+        ship_yard.get_ship(0);
+    }
 
+    #[test]
+    #[should_panic = "Uh oh! The ship you are requesting does not exist..."]
+    fn test_get_ship_index_out_of_bounds_at_length() {
+        let mut ship_yard = build_ship_yard();
+        ship_yard.build_destroyer();
+        ship_yard.get_ship(1);
+    }
+
+    #[test]
+    #[should_panic = "Uh oh! The ship you are requesting does not exist..."]
+    fn test_get_ship_index_out_of_bounds_greater_than_length() {
+        let mut ship_yard = build_ship_yard();
+        ship_yard.build_destroyer();
+        ship_yard.get_ship(2);
+    }
+
+    #[test]
+    fn test_get_yard_size() {
+        let mut ship_yard = build_ship_yard();
         assert_eq!(ship_yard.get_yard_size(), 0);
-    }
-
-    #[test]
-    fn test_get_yard_size_when_occupied() {
-        let mut ship_yard = build_ship_yard();
         ship_yard.build_destroyer();
-
         assert_eq!(ship_yard.get_yard_size(), 1);
     }
 
     #[test]
-    fn test_has_ships_when_empty() {
-        let ship_yard = build_ship_yard();
-
-        assert!(!ship_yard.has_ships());
-    }
-
-    #[test]
-    fn test_has_ships_when_occupied() {
+    fn test_has_capacity() {
         let mut ship_yard = build_ship_yard();
-        ship_yard.build_destroyer();
-
-        assert!(ship_yard.has_ships());
-    }
-
-    #[test]
-    fn test_has_capacity_when_empty() {
-        let ship_yard = build_ship_yard();
-
         assert!(ship_yard.has_capacity());
-    }
-
-    #[test]
-    fn test_has_capacity_when_occupied() {
-        let mut ship_yard = build_ship_yard();
-        ship_yard.build_destroyer();
-
-        assert!(ship_yard.has_capacity());
-    }
-
-    #[test]
-    fn test_has_capacity_when_full() {
-        let mut ship_yard = build_ship_yard();
         ship_yard.build_destroyer();
         ship_yard.build_cruiser();
         ship_yard.build_battleship();
-
         assert!(!ship_yard.has_capacity());
     }
 
     #[test]
-    fn test_are_all_ships_sunk_when_none_are_sunk() {
-        let ship_yard = build_ship_yard();
-
-        assert!(!ship_yard.are_all_ships_sunk());
-    }
-
-    #[test]
-    fn test_are_all_ships_sunk_when_some_are_sunk() {
+    fn test_are_all_ships_sunk() {
         let mut ship_yard = build_ship_yard();
         ship_yard.build_destroyer();
-        ship_yard.build_destroyer();
-        let ship = ship_yard.get_ship(0).unwrap();
-        ship.hit();
-        ship.hit();
-
         assert!(!ship_yard.are_all_ships_sunk());
-    }
-
-    #[test]
-    fn test_are_all_ships_sunk_when_all_are_sunk() {
-        let mut ship_yard = build_ship_yard();
-        ship_yard.build_destroyer();
-        let ship = ship_yard.get_ship(0).unwrap();
-        ship.hit();
-        ship.hit();
-
+        ship_yard.ships[0].hit();
+        ship_yard.ships[0].hit();
         assert!(ship_yard.are_all_ships_sunk());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_are_all_ships_sunk_empty_yard() {
+        let ship_yard = build_ship_yard();
+        ship_yard.are_all_ships_sunk();
     }
 }

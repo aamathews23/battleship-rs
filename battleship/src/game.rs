@@ -45,10 +45,6 @@ impl Game {
     }
 
     fn sg(&mut self, generator: &mut dyn RandomGeneratorTrait) {
-        if !self.ship_yard.has_ships() {
-            panic!("Uh oh! Please provide at least one ship.");
-        }
-
         self.board.init_board(&mut self.ship_yard, generator);
     }
 }
@@ -71,7 +67,7 @@ impl ShootTrait for Game {
 
         self.amt_of_hits += 1;
 
-        let ship = &mut self.ship_yard.get_ship(shot_res as usize).expect("a ship to be present in the ship yard");
+        let ship = self.ship_yard.get_ship(shot_res as usize);
         ship.hit();
 
         if ship.health == 0 {
@@ -131,19 +127,6 @@ mod tests {
         assert_eq!(game.ships_sunk, 0);
         assert_eq!(game.board.cells.len(), 8);
         assert_eq!(game.board.cells[0][0].cell_type, 1);
-    }
-
-    #[test]
-    #[should_panic(expected = "Uh oh! Please provide at least one ship.")]
-    fn test_start_game_no_ships_failure() {
-        let mut mock = MockRandomGeneratorTrait::new();
-        mock.expect_generate()
-            .returning(|_s, _e| 0);
-
-        let mut game = Game::new(8);
-
-        game.sg(&mut mock);
-
     }
 
     #[test]
