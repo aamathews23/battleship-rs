@@ -1,16 +1,13 @@
 extern crate dotenv;
 
+use battleship::game_trait::GameTrait;
 use dotenv::dotenv;
 use game_cli::GameCli;
-use battleship::game_trait::GameTrait;
 
 mod game_cli;
 
 fn main() {
     // TODO: Add integration tests for battleship pkg
-    // TODO: Add unit tests for CLI funcs
-    // TODO: Properly scope board in game
-    // TODO: Properly scope game params
     // TODO: Add pipeline build in Github
     dotenv().expect("dotenv loaded environment vars from .env");
     let mut game_cli = GameCli::new();

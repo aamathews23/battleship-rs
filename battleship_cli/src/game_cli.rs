@@ -1,24 +1,20 @@
-use battleship::{
-    game::Game,
-    game_trait::GameTrait,
-    shoot_trait::ShootTrait
-};
+use battleship::{game::Game, game_trait::GameTrait, shoot_trait::ShootTrait};
 use regex::Regex;
-use std::{env, io::{
-    stdin,
-    stdout,
-    Write
-}};
+use std::{
+    env,
+    io::{stdin, stdout, Write},
+};
 
+#[derive(Debug, PartialEq)]
 pub enum GameInputValidationType {
     Coords(Vec<i32>),
-    Stats,
+   Stats,
     Quit,
-    InvalidInput
+    InvalidInput,
 }
 
 pub struct GameCli {
-    pub game: Game
+    game: Game,
 }
 
 impl GameCli {
@@ -27,22 +23,12 @@ impl GameCli {
         game.add_destroyer();
         game.add_cruiser();
         game.add_battleship();
-        Self {
-            game
-        }
+        game.start_game();
+        Self { game }
     }
 
-    fn get_user_input() -> GameInputValidationType {
-        let mut s = String::new();
+    fn get_user_input(s: &str) -> GameInputValidationType {
         let re = Regex::new(r"^([A-H]|[a-h])([1-8])$").unwrap();
-        let _ = stdout().flush();
-        stdin().read_line(&mut s).expect("Did not enter a correct string");
-        if let Some('\n') = s.chars().next_back() {
-            s.pop();
-        }
-        if let Some('\r') = s.chars().next_back() {
-            s.pop();
-        }
 
         if s == "stats" {
             return GameInputValidationType::Stats;
@@ -51,15 +37,21 @@ impl GameCli {
         if s == "quit" {
             return GameInputValidationType::Quit;
         }
-        
-        if re.is_match(&s) {
+
+        if re.is_match(s) {
             let coords: Vec<&str> = s.split("").collect();
             let x = coords[1]
-                .to_lowercase().chars().nth(0).expect("a character") as i32
+                .to_lowercase()
+                .chars()
+                .nth(0)
+                .expect("a character") as i32
                 - 97;
             let y = coords[2]
-                .chars().nth(0).expect("a digit")
-                .to_digit(10).expect("a valid digit") as i32
+                .chars()
+                .nth(0)
+                .expect("a digit")
+                .to_digit(10)
+                .expect("a valid digit") as i32
                 - 1;
             let mut res = Vec::new();
             res.push(x);
@@ -70,6 +62,22 @@ impl GameCli {
         GameInputValidationType::InvalidInput
     }
 
+    fn parse_user_input() -> GameInputValidationType {
+        let mut s = String::new();
+        let _ = stdout().flush();
+        stdin()
+            .read_line(&mut s)
+            .expect("Did not enter a correct string");
+        if let Some('\n') = s.chars().next_back() {
+            s.pop();
+        }
+        if let Some('\r') = s.chars().next_back() {
+            s.pop();
+        }
+
+        Self::get_user_input(&s)
+    }
+
     fn print_board(&self) {
         let mut board = "   A B C D E F G H \n-------------------".to_owned();
         let mut count = 1;
@@ -77,14 +85,26 @@ impl GameCli {
             board.push_str(&format!("\n{} |", count));
             for cell in row {
                 let cell_debug: bool = match env::var("CELL_DEBUG") {
-                    Ok(value) => if value == "1" { true } else { false },
-                    Err(_) => false
+                    Ok(value) => {
+                        if value == "1" {
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    Err(_) => false,
                 };
                 let cell_string = match cell.cell_type {
                     -1 => "O",
-                    1 => if cell_debug { "S" } else { " " },
+                    1 => {
+                        if cell_debug {
+                            "S"
+                        } else {
+                            " "
+                        }
+                    }
                     2 => "X",
-                    _ => " "
+                    _ => " ",
                 };
                 board.push_str(cell_string);
                 board.push_str("|");
@@ -98,7 +118,7 @@ impl GameCli {
         let shot = match self.game.shoot(x, y) {
             0 => "Hit.",
             1 => "Ship sunk!",
-            _ => "Miss..."
+            _ => "Miss...",
         };
         println!("{}", shot);
     }
@@ -116,7 +136,7 @@ impl GameTrait for GameCli {
         loop {
             self.print_board();
             print!("\nWhere do you want to shoot? ");
-            let input = Self::get_user_input();
+            let input = Self::parse_user_input();
 
             match input {
                 GameInputValidationType::Stats => {
@@ -124,7 +144,7 @@ impl GameTrait for GameCli {
                     println!("Here is your current game stats:");
                     self.print_stats();
                     println!();
-                },
+                }
                 GameInputValidationType::Quit => {
                     break;
                 }
@@ -132,7 +152,7 @@ impl GameTrait for GameCli {
                     println!();
                     self.print_shot(coords[0], coords[1]);
                     println!();
-                },
+                }
                 GameInputValidationType::InvalidInput => {
                     println!("\nInvalid input, try again.\n")
                 }
@@ -144,5 +164,47 @@ impl GameTrait for GameCli {
                 break;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let game_cli = GameCli::new();
+        assert_eq!(game_cli.game.board.cells.len(), 8);
+    }
+
+    #[test]
+    fn test_get_user_input_quit() {
+        assert_eq!(GameCli::get_user_input("quit"), GameInputValidationType::Quit);
+    }
+
+    #[test]
+    fn test_get_user_input_stats() {
+        assert_eq!(GameCli::get_user_input("stats"), GameInputValidationType::Stats);
+    }
+
+    #[test]
+    fn test_get_user_input_invalid() {
+        assert_eq!(GameCli::get_user_input("invalid"), GameInputValidationType::InvalidInput);
+    }
+
+    #[test]
+    fn test_get_user_input_coords_success() {
+        assert_eq!(GameCli::get_user_input("A1"), GameInputValidationType::Coords([0, 0].to_vec()));
+    }
+
+    #[test]
+    fn test_get_user_input_coords_invalid_x_coord() {
+        assert_eq!(GameCli::get_user_input("Z1"), GameInputValidationType::InvalidInput);
+    }
+
+
+    #[test]
+    fn test_get_user_input_coords_invalid_y_coord() {
+        assert_eq!(GameCli::get_user_input("A9"), GameInputValidationType::InvalidInput);
     }
 }
