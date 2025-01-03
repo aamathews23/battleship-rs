@@ -1,7 +1,7 @@
 name: Build and test
 on: [push, pull_request]
 env:
-    CELL_DEBUG=0
+    CELL_DEBUG: 0
 jobs:
     build:
         runs-on: ubuntu-latest
