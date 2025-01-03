@@ -1,7 +1,11 @@
-[package]
-name = "battleship-rs"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["battleship", "battleship_cli"]
+resolver = "2"
 
-[dependencies]
-rand = "0.8.5"
+[workspace.package]
+name = "battleship-rs"
+authors = ["Aaron Mathews <aamathews23@gmail.com>"]
+edition = "2021"
+homepage = "https://github.com/aamathews23/battleship-rs"
+readme = "README.md"
+repository = "https://github.com/aamathews23/battleship-rs"
