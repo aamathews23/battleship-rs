@@ -7,7 +7,6 @@ use game_cli::GameCli;
 mod game_cli;
 
 fn main() {
-    // TODO: Add pipeline build in Github
     dotenv().expect("dotenv loaded environment vars from .env");
     let mut game_cli = GameCli::new();
 

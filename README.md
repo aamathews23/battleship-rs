@@ -25,7 +25,7 @@ For fun and to learn a few things:
 
 1. A basic implementation of battleship that can be played in the CLI. :white_check_mark:
 2. A basic implementation of battleship that can be played on the web.
-3. Add React + Typescript + Vite on the web.
+3. Add Vue 3 + Typescript + Vite on the web.
 4. Add local multiplayer to CLI: local stat saves. (optional)
 5. Create player profile web application: user auth, account management. (optional)
 6. Add multiplayer functions to web app: user auth, lobbies, invites, stat saves. (optional)
@@ -34,8 +34,8 @@ For fun and to learn a few things:
 ## technologies
 
 - Rust
-- React
-- Nextjs
+- Vue 3
+- Nuxt
 - SQL
 - Redis
 - REST
