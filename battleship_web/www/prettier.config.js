@@ -1,4 +1,4 @@
-const config = {
+export default {
   semi: true,
   trailingComma: 'all',
   singleQuote: true,
@@ -6,5 +6,3 @@ const config = {
   endOfLine: 'auto',
   singleAttributePerLine: true,
 };
-
-export default config;
