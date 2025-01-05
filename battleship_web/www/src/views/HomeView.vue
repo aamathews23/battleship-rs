@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const handleOnClick = () => {
+  router.push('game');
+};
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <h1>Battleship</h1>
+    <p>The classic game of Battleship created in Rust, Vue and Wasm.</p>
+    <button @click="handleOnClick">Play game</button>
   </main>
 </template>
