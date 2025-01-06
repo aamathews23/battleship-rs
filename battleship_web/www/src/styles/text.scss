@@ -1,0 +1,22 @@
+@use './tokens' as *;
+
+@mixin text-base {
+  color: var(--text-color, $color-gray-dark);
+  font-family: 'Roboto', serif;
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+@mixin text-heading-xl {
+  color: var(--text-color, $color-gray-dark);
+  font-family: 'Noto Serif Display', serif;
+  font-weight: 800;
+  font-size: 5rem;
+}
+
+@mixin text-heading-card {
+  color: var(--text-color, $color-gray-dark);
+  font-family: 'Roboto', serif;
+  font-weight: 800;
+  font-size: 2rem;
+}

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ButtonComponent from '@/components/ButtonComponent.vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -9,9 +10,32 @@ const handleOnClick = () => {
 </script>
 
 <template>
-  <main>
-    <h1>Battleship</h1>
-    <p>The classic game of Battleship created in Rust, Vue and Wasm.</p>
-    <button @click="handleOnClick">Play game</button>
+  <main class="home-view">
+    <h1 class="home-view__heading">Battleship</h1>
+    <p class="home-view__description">
+      The classic game of Battleship created in Rust, Vue and Wasm.
+    </p>
+    <ButtonComponent @click="handleOnClick">Play game</ButtonComponent>
   </main>
 </template>
+
+<style lang="scss" scoped>
+@use '../styles/text.scss' as *;
+
+.home-view {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+
+  &__heading {
+    @include text-heading-xl;
+  }
+
+  &__description {
+    @include text-base;
+  }
+}
+</style>
