@@ -2,5 +2,5 @@ use mockall::automock;
 
 #[automock]
 pub trait RandomGeneratorTrait {
-    fn generate(&mut self, start: i32, end: i32) -> i32;
+    fn generate(&mut self, start: u32, end: u32) -> u32;
 }
