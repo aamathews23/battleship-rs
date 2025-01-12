@@ -1,14 +1,18 @@
 [package]
 name = "battleship_web"
 version = "0.1.0"
-authors = ["Aaron Mathews <aamathews23@gmail.com>"]
-edition = "2018"
+description = "simple web game consuming the `battleship` library package."
+authors.workspace = true
+edition.workspace = true
+homepage.workspace = true
+repository.workspace = true
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 wasm-bindgen = "0.2.84"
+battleship = { version = "0.1.0", path = "../battleship" }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.34"

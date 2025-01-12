@@ -38,6 +38,7 @@ dependencies = [
 name = "battleship_web"
 version = "0.1.0"
 dependencies = [
+ "battleship",
  "wasm-bindgen",
  "wasm-bindgen-test",
 ]

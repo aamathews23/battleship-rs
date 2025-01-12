@@ -3,35 +3,39 @@ use std::usize;
 use crate::board_cell::BoardCell;
 
 pub struct Board {
-    cells: Vec<Vec<BoardCell>>
+    width: usize,
+    cells: Vec<BoardCell>
 }
 
 impl Board {
-    pub fn new(size: usize) -> Self {
-        if size <= 0 {
-            panic!("Uh oh! Please provide a board size greater than 0.");
+    pub fn new(width: usize) -> Self {
+        if width <= 0 {
+            panic!("Uh oh! Please provide a board width greater than 0.");
         }
 
         let mut cells = Vec::new();
 
-        (0..size).for_each(|i| {
-            cells.push(Vec::new());
-            (0..size).for_each(|_j| {
-                cells[i].push(BoardCell::Unknown);
-            });
+        (0..width).for_each(|_i| {
+            cells.push(BoardCell::Unknown);
         });
 
         Self {
+            width,
             cells
         }
     }
 
+    fn get_index(&self, x: usize, y: usize) -> usize {
+        x * self.width + y
+    }
+
     pub fn get_cell(&self, x: usize, y: usize) -> BoardCell {
-        self.cells[y][x]
+        self.cells[self.get_index(x, y)]
     }
 
     pub fn set_cell(&mut self, x: usize, y: usize, new_value: BoardCell) {
-        self.cells[y][x] = new_value;
+        let idx = self.get_index(x, y);
+        self.cells[idx] = new_value;
     }
 }
 
@@ -43,7 +47,16 @@ mod tests {
     fn test_new() {
         let board = Board::new(8);
         assert_eq!(board.cells.len(), 8);
-        assert_eq!(board.cells[0][0], BoardCell::Unknown);
+        assert_eq!(board.cells[0], BoardCell::Unknown);
+    }
+
+    #[test]
+    fn test_get_index() {
+        let board = Board::new(8);
+
+        assert_eq!(board.get_index(0, 0), 0);
+        assert_eq!(board.get_index(0, 1), 1);
+        assert_eq!(board.get_index(2, 5), 21);
     }
 
     #[test]
@@ -64,8 +77,8 @@ mod tests {
     fn test_set_cell() {
         let mut board = Board::new(8);
 
-        assert_eq!(board.cells[0][0], BoardCell::Unknown);
+        assert_eq!(board.cells[0], BoardCell::Unknown);
         board.set_cell(0, 0, BoardCell::Hit);
-        assert_eq!(board.cells[0][0], BoardCell::Hit);
+        assert_eq!(board.cells[0], BoardCell::Hit);
     }
 }
