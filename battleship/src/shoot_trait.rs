@@ -1,9 +1,9 @@
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ShootTraitResult {
-    Miss = -1,
     Repeat = 0,
-    Hit = 1,
-    Sunk = 2
+    Miss = 1,
+    Hit = 2,
+    Sunk = 3
 }
 
 pub trait ShootTrait {

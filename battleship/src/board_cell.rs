@@ -1,7 +1,7 @@
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BoardCell {
-    Miss = -1,
-    Unknown = 0,
-    Hit = 1,
-    Ship = 2
+    Unknown =  0,
+    Miss = 1,
+    Hit = 2,
+    Ship = 3
 }

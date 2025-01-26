@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import GameSquare from './GameSquare.vue';
+import { useGameStore } from '@/stores/game';
+
+const store = useGameStore();
 </script>
 
 <template>
   <section class="game-shelf">
     <GameSquare
-      v-for="i in 64"
-      :key="`game-square-${i}`"
+      v-for="(cell, idx) in store.board"
+      :key="`game-square-${idx}`"
+      :variant="cell"
+      @click="store.shoot(idx)"
     />
   </section>
 </template>

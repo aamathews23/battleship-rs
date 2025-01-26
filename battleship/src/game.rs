@@ -54,6 +54,7 @@ impl ShootTrait for Game {
             ShootTraitResult::Sunk => {
                 self.amt_of_hits += 1;
                 self.ships_sunk += 1;
+                self.board.set_cell(x as usize, y as usize, BoardCell::Hit);
             },
             ShootTraitResult::Repeat => {} // do nothing
         }

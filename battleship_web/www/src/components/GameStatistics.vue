@@ -1,8 +1,15 @@
+<script setup lang="ts">
+import { useGameStore } from '@/stores/game';
+
+const store = useGameStore();
+</script>
+
 <template>
   <section class="game-statistics">
-    <p class="game-statistics__stat"># of turns: 0</p>
-    <p class="game-statistics__stat"># of hits: 0</p>
-    <p class="game-statistics__stat"># of misses: 0</p>
+    <p class="game-statistics__stat"># of turns: {{ store.amtOfTurns }}</p>
+    <p class="game-statistics__stat"># of hits: {{ store.amtOfHits }}</p>
+    <p class="game-statistics__stat"># of misses: {{ store.amtOfMisses }}</p>
+    <p class="game-statistics__stat"># of ships sunk: {{ store.shipsSunk }}</p>
   </section>
 </template>
 

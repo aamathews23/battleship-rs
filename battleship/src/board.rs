@@ -15,7 +15,7 @@ impl Board {
 
         let mut cells = Vec::new();
 
-        (0..width).for_each(|_i| {
+        (0..(width * width)).for_each(|_i| {
             cells.push(BoardCell::Unknown);
         });
 
@@ -27,6 +27,10 @@ impl Board {
 
     fn get_index(&self, x: usize, y: usize) -> usize {
         x * self.width + y
+    }
+
+    pub fn get_cells(&self) -> &Vec<BoardCell> {
+        &self.cells
     }
 
     pub fn get_cell(&self, x: usize, y: usize) -> BoardCell {
@@ -46,7 +50,7 @@ mod tests {
     #[test]
     fn test_new() {
         let board = Board::new(8);
-        assert_eq!(board.cells.len(), 8);
+        assert_eq!(board.cells.len(), 64);
         assert_eq!(board.cells[0], BoardCell::Unknown);
     }
 
@@ -60,7 +64,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Uh oh! Please provide a board size greater than 0.")]
+    #[should_panic(expected = "Uh oh! Please provide a board width greater than 0.")]
     fn test_new_size_zero() {
         Board::new(0);
     }

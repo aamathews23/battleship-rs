@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { GameSquareVariant } from '@/types';
 
-interface GameSquareProps {
-  variant?: 'unknown' | 'hit' | 'miss';
+export interface GameSquareProps {
+  variant?: GameSquareVariant;
   mini?: boolean;
   disabled?: boolean;
 }
@@ -13,6 +14,10 @@ const props = withDefaults(defineProps<GameSquareProps>(), {
   disabled: false,
 });
 
+const tag = props.mini ? 'div' : 'button';
+
+const attrs = props.mini ? { 'aria-hidden': true } : { type: 'button' };
+
 const classes = computed(() => ({
   'game-square': true,
   [`game-square--${props.variant}`]: true,
@@ -22,22 +27,25 @@ const classes = computed(() => ({
 
 const ariaLabel = computed(() => {
   switch (props.variant) {
-    case 'unknown':
-      return 'Unknown.';
+    case 'miss':
+      return 'Miss...';
     case 'hit':
       return 'Hit!';
+    case 'ship':
+      return 'Ship.';
     default:
-      return 'Miss...';
+      return 'Unknown.';
   }
 });
 </script>
 
 <template>
-  <div
+  <component
+    :is="tag"
     :class="classes"
     :aria-label="ariaLabel"
-    tabindex="0"
-  ></div>
+    v-bind="attrs"
+  />
 </template>
 
 <style lang="scss" scoped>
@@ -47,6 +55,7 @@ const ariaLabel = computed(() => {
   width: $space-four-x;
   height: $space-four-x;
   outline: none;
+  border: none;
 
   &:hover,
   &:focus {
@@ -78,6 +87,25 @@ const ariaLabel = computed(() => {
       &:hover,
       &:focus {
         background-color: $color-blue-light;
+        cursor: default;
+      }
+    }
+  }
+
+  &--ship {
+    background-color: $color-orange-light;
+    transition: all 300ms;
+
+    &:hover,
+    &:focus {
+      background-color: $color-orange;
+      cursor: pointer;
+    }
+
+    &.game-square--disabled {
+      &:hover,
+      &:focus {
+        background-color: $color-orange-light;
         cursor: default;
       }
     }

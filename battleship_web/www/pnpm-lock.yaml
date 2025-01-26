@@ -8,9 +8,15 @@ importers:
 
   .:
     dependencies:
+      battleship_web:
+        specifier: file:../pkg
+        version: file:../pkg
       pinia:
         specifier: ^2.3.0
         version: 2.3.0(typescript@5.6.3)(vue@3.5.13(typescript@5.6.3))
+      vite-plugin-wasm:
+        specifier: ^3.4.1
+        version: 3.4.1(vite@6.0.7(@types/node@22.10.5)(sass-embedded@1.83.1))
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.6.3)
@@ -1009,6 +1015,9 @@ packages:
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
+
+  battleship_web@file:../pkg:
+    resolution: {directory: ../pkg, type: directory}
 
   birpc@0.2.19:
     resolution: {integrity: sha512-5WeXXAvTmitV1RqJFppT5QtUiz2p1mRSYU000Jkft5ZUCLJIk4uQriYNO50HknxKwM6jd8utNc66K1qGIwwWBQ==}
@@ -2197,6 +2206,11 @@ packages:
     peerDependencies:
       vite: ^3.0.0-0 || ^4.0.0-0 || ^5.0.0-0 || ^6.0.0-0
 
+  vite-plugin-wasm@3.4.1:
+    resolution: {integrity: sha512-ja3nSo2UCkVeitltJGkS3pfQHAanHv/DqGatdI39ja6McgABlpsZ5hVgl6wuR8Qx5etY3T5qgDQhOWzc5RReZA==}
+    peerDependencies:
+      vite: ^2 || ^3 || ^4 || ^5 || ^6
+
   vite@5.4.11:
     resolution: {integrity: sha512-c7jFQRklXua0mTzneGW9QVyxFjUgwcihC4bXEtujIo2ouWCe1Ajt/amn2PCxYnhYfd5k09JX3SB7OYWFKYqj8Q==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -3282,6 +3296,8 @@ snapshots:
   asynckit@0.4.0: {}
 
   balanced-match@1.0.2: {}
+
+  battleship_web@file:../pkg: {}
 
   birpc@0.2.19: {}
 
@@ -4448,6 +4464,10 @@ snapshots:
       vite: 6.0.7(@types/node@22.10.5)(sass-embedded@1.83.1)
     transitivePeerDependencies:
       - supports-color
+
+  vite-plugin-wasm@3.4.1(vite@6.0.7(@types/node@22.10.5)(sass-embedded@1.83.1)):
+    dependencies:
+      vite: 6.0.7(@types/node@22.10.5)(sass-embedded@1.83.1)
 
   vite@5.4.11(@types/node@22.10.5)(sass-embedded@1.83.1):
     dependencies:

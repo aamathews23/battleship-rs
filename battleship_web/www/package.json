@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --force",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "test:unit": "vitest",
@@ -15,7 +15,9 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "battleship_web": "file:../pkg",
     "pinia": "^2.3.0",
+    "vite-plugin-wasm": "^3.4.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
