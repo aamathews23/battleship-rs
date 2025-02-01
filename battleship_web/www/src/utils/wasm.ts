@@ -6,7 +6,11 @@ type WasmMemory = {
 };
 
 const memory: WasmMemory = wasm_memory();
-export const battleshipWeb = BattleshipWeb.new();
+export let battleshipWeb = BattleshipWeb.new();
+
+export const resetGame = () => {
+  battleshipWeb = BattleshipWeb.new();
+};
 
 export const getGameBoard = (size: number): GameSquareVariant[] => {
   const board = new Uint8Array(memory.buffer, battleshipWeb.board(), size);

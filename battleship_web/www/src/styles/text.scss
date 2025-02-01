@@ -7,6 +7,13 @@
   font-size: 1rem;
 }
 
+@mixin text-heading-lg {
+  color: var(--text-color, $color-gray-dark);
+  font-family: 'Noto Serif Display', serif;
+  font-weight: 800;
+  font-size: 3rem;
+}
+
 @mixin text-heading-xl {
   color: var(--text-color, $color-gray-dark);
   font-family: 'Noto Serif Display', serif;

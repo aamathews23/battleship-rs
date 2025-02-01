@@ -3,6 +3,9 @@ import GameShelf from '@/components/GameShelf.vue';
 import GameKey from '@/components/GameKey.vue';
 import GameStatistics from '@/components/GameStatistics.vue';
 import ButtonComponent from '@/components/ButtonComponent.vue';
+import { useGameStore } from '@/stores/game';
+
+const store = useGameStore();
 </script>
 
 <template>
@@ -13,7 +16,12 @@ import ButtonComponent from '@/components/ButtonComponent.vue';
       <div class="game-view__controls">
         <GameKey />
         <GameStatistics />
-        <ButtonComponent variant="secondary">Reset</ButtonComponent>
+        <ButtonComponent
+          variant="secondary"
+          @click="store.reset"
+        >
+          Reset
+        </ButtonComponent>
       </div>
       <GameShelf />
     </section>

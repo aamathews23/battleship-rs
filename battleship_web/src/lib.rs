@@ -60,4 +60,8 @@ impl BattleshipWeb {
         let y = idx % 8;
         self.game.shoot(x, y);
     }
+
+    pub fn reset(&mut self) {
+        self.game.start_game();
+    }
 }
