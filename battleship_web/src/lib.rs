@@ -9,6 +9,15 @@ use battleship::{
     shoot_trait::ShootTrait
 };
 
+/**
+ * TODO: Add wasm bindgen tests
+ * TODO: Load .env file and conditionally render the Ship vs Unknown cell.
+ * TODO: Add Vue component tests
+ * TODO: Add Pinia store tests
+ * TODO: Add E2E Playwright tests
+ * TODO: Refactor build and deploy pipeline
+ */
+
 #[wasm_bindgen]
 pub fn wasm_memory() -> JsValue {
     wasm_bindgen::memory()

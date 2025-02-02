@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-interface ButtonComponentProps {
+export interface ButtonComponentProps {
   class?: string;
   type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary';
