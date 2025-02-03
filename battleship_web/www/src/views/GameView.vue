@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import GameShelf from '@/components/GameShelf.vue';
-import GameKey from '@/components/GameKey.vue';
-import GameStatistics from '@/components/GameStatistics.vue';
 import ButtonComponent from '@/components/ButtonComponent.vue';
+import GameSquare from '@/components/GameSquare.vue';
 import { useGameStore } from '@/stores/game';
 
 const store = useGameStore();
@@ -13,22 +11,33 @@ const store = useGameStore();
     <h1 class="game-view__heading">Battleship</h1>
     <p class="game-view__description">Sink all the ships to win!</p>
     <section class="game-view__game">
-      <div class="game-view__controls">
-        <GameKey />
-        <GameStatistics />
-        <ButtonComponent
-          variant="secondary"
-          @click="store.reset"
-        >
-          Reset
-        </ButtonComponent>
+      <template v-if="store.isEnd">
+        <h2 class="game-view__subheading">You win!</h2>
+        <div class="game-view__statistics">
+          <p class="game-view__stat"># of turns: {{ store.amtOfTurns }}</p>
+          <p class="game-view__stat"># of hits: {{ store.amtOfHits }}</p>
+          <p class="game-view__stat"># of misses: {{ store.amtOfMisses }}</p>
+          <p class="game-view__stat"># of ships sunk: {{ store.shipsSunk }}</p>
+        </div>
+        <ButtonComponent @click="store.reset">Play again</ButtonComponent>
+      </template>
+      <div
+        v-else
+        class="game-view__grid"
+      >
+        <GameSquare
+          v-for="(cell, idx) in store.board"
+          :key="`game-square-${idx}`"
+          :variant="cell"
+          @click="store.shoot(idx)"
+        />
       </div>
-      <GameShelf />
     </section>
   </main>
 </template>
 
 <style lang="scss" scoped>
+@use '../styles/tokens.scss' as *;
 @use '../styles/text.scss' as *;
 
 .game-view {
@@ -43,20 +52,52 @@ const store = useGameStore();
     @include text-heading-xl;
   }
 
+  &__subheading {
+    @include text-heading-lg;
+  }
+
   &__description {
     @include text-base;
   }
 
-  &__game {
-    display: grid;
-    grid-template-columns: 1fr 600px;
-    gap: 64px;
+  &__statistics {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $space-one-x;
+    max-width: 300px;
   }
 
-  &__controls {
+  &__stat {
+    @include text-base;
+  }
+
+  &__subheading,
+  &__stat {
+    --text-color: #{$color-gray-light};
+  }
+
+  &__game {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    align-items: center;
+    justify-content: center;
+    gap: $space-two-x;
+    background-color: $color-blue-dark;
+    padding: $space-one-x;
+    width: 600px;
+    max-width: 600px;
+    height: 600px;
+    max-height: 600px;
+    border-radius: 8px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: $space-half-x;
   }
 }
 </style>

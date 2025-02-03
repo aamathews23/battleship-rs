@@ -4,26 +4,13 @@ import type { GameSquareVariant } from '@/types';
 
 export interface GameSquareProps {
   variant?: GameSquareVariant;
-  mini?: boolean;
-  disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<GameSquareProps>(), {
   variant: 'unknown',
-  mini: false,
-  disabled: false,
 });
 
-const tag = props.mini ? 'div' : 'button';
-
-const attrs = props.mini ? { 'aria-hidden': true } : { type: 'button' };
-
-const classes = computed(() => ({
-  'game-square': true,
-  [`game-square--${props.variant}`]: true,
-  'game-square--mini': props.mini,
-  'game-square--disabled': props.disabled,
-}));
+const classes = computed(() => ['game-square', `game-square--${props.variant}`]);
 
 const ariaLabel = computed(() => {
   switch (props.variant) {
@@ -40,11 +27,9 @@ const ariaLabel = computed(() => {
 </script>
 
 <template>
-  <component
-    :is="tag"
+  <button
     :class="classes"
     :aria-label="ariaLabel"
-    v-bind="attrs"
   />
 </template>
 
@@ -56,67 +41,43 @@ const ariaLabel = computed(() => {
   height: $space-four-x;
   outline: none;
   border: none;
+  background-color: var(--game-square-bg-color);
+  transition: all 300ms;
+  border-radius: 4px;
+
+  &:hover {
+    cursor: pointer;
+  }
 
   &:hover,
   &:focus {
     border: 1px solid $color-gray-dark;
-
-    &.game-square--disabled {
-      &:hover {
-        border: none;
-      }
-    }
-  }
-
-  &--mini {
-    width: $space-one-x;
-    height: $space-one-x;
   }
 
   &--unknown {
-    background-color: $color-blue-light;
-    transition: all 300ms;
+    --game-square-bg-color: #{$color-blue-light};
 
     &:hover,
     &:focus {
-      background-color: $color-blue;
-      cursor: pointer;
-    }
-
-    &.game-square--disabled {
-      &:hover,
-      &:focus {
-        background-color: $color-blue-light;
-        cursor: default;
-      }
+      --game-square-bg-color: #{$color-blue};
     }
   }
 
   &--ship {
-    background-color: $color-orange-light;
-    transition: all 300ms;
+    --game-square-bg-color: #{$color-orange-light};
 
     &:hover,
     &:focus {
-      background-color: $color-orange;
-      cursor: pointer;
-    }
-
-    &.game-square--disabled {
-      &:hover,
-      &:focus {
-        background-color: $color-orange-light;
-        cursor: default;
-      }
+      --game-square-bg-color: #{$color-orange};
     }
   }
 
   &--hit {
-    background-color: $color-green-light;
+    --game-square-bg-color: #{$color-green-light};
   }
 
   &--miss {
-    background-color: $color-red-light;
+    --game-square-bg-color: #{$color-red-light};
   }
 }
 </style>

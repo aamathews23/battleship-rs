@@ -12,10 +12,11 @@ use battleship::{
 /**
  * TODO: Add wasm bindgen tests
  * TODO: Load .env file and conditionally render the Ship vs Unknown cell.
- * TODO: Add Vue component tests
- * TODO: Add Pinia store tests
+ * TODO: Add Pinia store tests via GameView
+ * TODO: Add wasm util unit tests
  * TODO: Add E2E Playwright tests
  * TODO: Refactor build and deploy pipeline
+ * TODO: Add file filter for coverage test
  */
 
 #[wasm_bindgen]
