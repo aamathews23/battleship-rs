@@ -1,0 +1,43 @@
+name: Build and Test Battleship Web
+
+on:
+  push:
+    paths:
+      - battleship_web/**
+jobs:
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    defaults:
+      run:
+        working-directory: ./battleship_web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '22.14'
+      - run: rustup update
+      - run: cargo build
+      - run: cargo test
+      - name: Install NPM
+        run: npm install
+        working-directory: ./battleship_web/www
+      - name: Run lint
+        if: always()
+        run: npm run lint
+        working-directory: ./battleship_web/www
+      - name: Run test
+        if: always()
+        run: npm run test:coverage
+        working-directory: ./battleship_web/www
+        env:
+          VITE_CELL_DEBUG: 0
+      - name: Report Coverage
+        if: always()
+        uses:  davelosert/vitest-coverage-report-action@v2
+        with:
+          working-directory: ./battleship_web/www
+          pr-number: auto

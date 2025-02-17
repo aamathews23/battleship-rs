@@ -1,0 +1,20 @@
+name: Build and Test Battleship CLI
+
+on:
+  push:
+    paths:
+      - battleship_cli/**
+jobs:
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./battleship_cli
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update
+      - run: cargo build
+      - run: cargo test
+        env:
+          CELL_DEBUG: 0

@@ -1,0 +1,17 @@
+name: Build and Test Battleship
+
+on:
+  push:
+    paths:
+      - battleship/**
+jobs:
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./battleship
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo build
+      - run: cargo test

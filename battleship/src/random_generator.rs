@@ -19,8 +19,8 @@ impl RandomGeneratorImpl {
 }
 
 impl RandomGeneratorTrait for RandomGeneratorImpl {
-    fn generate(&mut self, start: i32, end: i32) -> i32 {
-        let choices: Vec<i32> = (start..end).collect();
+    fn generate(&mut self, start: u32, end: u32) -> u32 {
+        let choices: Vec<u32> = (start..end).collect();
         let choice = match choices.choose(&mut self.rng) {
             Some(num) => *num,
             _ => 0
@@ -38,7 +38,7 @@ mod tests {
     fn test_generate() {
         let mut generator = RandomGeneratorImpl::new();
         let outcome = generator.generate(0, 10);
-        assert!(outcome >= 0 && outcome <= 10);
+        assert!(outcome > 0 && outcome <= 10);
     }
 
     #[test]
@@ -51,7 +51,7 @@ mod tests {
     #[test]
     fn test_generate_when_invalid() {
         let mut generator = RandomGeneratorImpl::new();
-        let outcome = generator.generate(0, -1);
+        let outcome = generator.generate(1, 0);
         assert_eq!(outcome, 0);
     }
 }

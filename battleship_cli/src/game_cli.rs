@@ -1,4 +1,6 @@
-use battleship::{game::Game, game_trait::GameTrait, shoot_trait::ShootTrait};
+use battleship::{
+    board_cell::BoardCell, game::Game, game_trait::GameTrait, shoot_trait::{ShootTrait, ShootTraitResult}
+};
 use regex::Regex;
 use std::{
     env,
@@ -7,8 +9,8 @@ use std::{
 
 #[derive(Debug, PartialEq)]
 pub enum GameInputValidationType {
-    Coords(Vec<i32>),
-   Stats,
+    Coords(Vec<u32>),
+    Stats,
     Quit,
     InvalidInput,
 }
@@ -20,9 +22,6 @@ pub struct GameCli {
 impl GameCli {
     pub fn new() -> Self {
         let mut game = Game::new(8);
-        game.add_destroyer();
-        game.add_cruiser();
-        game.add_battleship();
         game.start_game();
         Self { game }
     }
@@ -44,14 +43,14 @@ impl GameCli {
                 .to_lowercase()
                 .chars()
                 .nth(0)
-                .expect("a character") as i32
+                .expect("a character") as u32
                 - 97;
             let y = coords[2]
                 .chars()
                 .nth(0)
                 .expect("a digit")
                 .to_digit(10)
-                .expect("a valid digit") as i32
+                .expect("a valid digit") as u32
                 - 1;
             let mut res = Vec::new();
             res.push(x);
@@ -80,45 +79,45 @@ impl GameCli {
 
     fn print_board(&self) {
         let mut board = "   A B C D E F G H \n-------------------".to_owned();
-        let mut count = 1;
-        for row in &self.game.board.cells {
-            board.push_str(&format!("\n{} |", count));
-            for cell in row {
-                let cell_debug: bool = match env::var("CELL_DEBUG") {
-                    Ok(value) => {
-                        if value == "1" {
-                            true
-                        } else {
-                            false
-                        }
-                    }
-                    Err(_) => false,
-                };
-                let cell_string = match cell.cell_type {
-                    -1 => "O",
-                    1 => {
+        let cell_debug: bool = match env::var("CELL_DEBUG") {
+            Ok(value) => {
+                if value == "1" {
+                    true
+                } else {
+                    false
+                }
+            }
+            Err(_) => false,
+        };
+        for y in 0..8 {
+            board.push_str(&format!("\n{} |", y + 1));
+            for x in 0..8 {
+                let cell = self.game.board.get_cell(x, y);
+                let cell_string: &str = match cell {
+                    BoardCell::Unknown => " ",
+                    BoardCell::Ship => {
                         if cell_debug {
                             "S"
                         } else {
                             " "
                         }
-                    }
-                    2 => "X",
-                    _ => " ",
+                    },
+                    BoardCell::Hit => "X",
+                    BoardCell::Miss => "O"
                 };
                 board.push_str(cell_string);
                 board.push_str("|");
             }
-            count += 1;
         }
         println!("{}", board);
     }
 
-    fn print_shot(&mut self, x: i32, y: i32) {
+    fn print_shot(&mut self, x: u32, y: u32) {
         let shot = match self.game.shoot(x, y) {
-            0 => "Hit.",
-            1 => "Ship sunk!",
-            _ => "Miss...",
+            ShootTraitResult::Hit => "Hit.",
+            ShootTraitResult::Miss => "Miss...",
+            ShootTraitResult::Sunk => "Sunk!",
+            ShootTraitResult::Repeat => "Try again."
         };
         println!("{}", shot);
     }
@@ -174,7 +173,11 @@ mod tests {
     #[test]
     fn test_new() {
         let game_cli = GameCli::new();
-        assert_eq!(game_cli.game.board.cells.len(), 8);
+        assert_eq!(game_cli.game.amt_of_hits, 0);
+        assert_eq!(game_cli.game.amt_of_misses, 0);
+        assert_eq!(game_cli.game.amt_of_turns, 0);
+        assert_eq!(game_cli.game.ships_sunk, 0);
+        assert_eq!(game_cli.game.is_end(), false);
     }
 
     #[test]
