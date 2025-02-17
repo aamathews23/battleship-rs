@@ -10,18 +10,7 @@ export default mergeConfig(
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
       coverage: {
-        include: ['src'],
-        exclude: [
-          'src/types',
-          'src/**/*.test.ts',
-          // tested in e2e
-          'src/App.vue',
-          'src/env.ts',
-          'src/main.ts',
-          'src/wasm.ts',
-          'src/stores/game.ts',
-          'src/views/GameView.vue',
-        ],
+        include: ['src/components', 'src/utils', 'src/stores', 'src/views'],
         thresholds: {
           branches: 80,
           functions: 80,

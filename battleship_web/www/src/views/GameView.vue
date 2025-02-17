@@ -54,7 +54,12 @@ const store = useGameStore();
             # of ships sunk: {{ store.shipsSunk }}
           </p>
         </div>
-        <ButtonComponent @click="store.reset">Play again</ButtonComponent>
+        <ButtonComponent
+          data-ui="game-view-play-again"
+          @click="store.reset"
+        >
+          Play again
+        </ButtonComponent>
       </template>
       <div
         v-else
@@ -65,7 +70,7 @@ const store = useGameStore();
           v-for="(cell, idx) in store.board"
           :key="`game-square-${idx}`"
           :variant="cell"
-          data-ui="game-view-cell"
+          data-ui="game-view-grid-cell"
           @click="store.shoot(idx)"
         />
       </div>

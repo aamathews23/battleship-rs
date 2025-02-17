@@ -5,7 +5,6 @@ import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
 import wasm from 'vite-plugin-wasm';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [vue(), vueDevTools(), wasm()],
   resolve: {
@@ -15,5 +14,12 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern',
+      },
+    },
   },
 });
