@@ -26,10 +26,10 @@ For fun and to learn a few things:
 1. A basic implementation of battleship that can be played in the CLI. :white_check_mark:
 2. A basic implementation of battleship that can be played on the web. :white_check_mark:
 3. Add Vue 3 + Typescript + Vite on the web. :white_check_mark:
-4. Add local multiplayer to CLI: local stat saves. (optional)
-5. Create player profile web application: user auth, account management. (optional)
-6. Add multiplayer functions to web app: user auth, lobbies, invites, stat saves. (optional)
-7. Add online functions to CLI: user auth, offline mode, local stat saves. (optional)
+4. Create player profile web application: user auth, account management.
+5. Add multiplayer functions to web app: user auth, lobbies, invites, stat saves.
+6. Add online functions to CLI: user auth, offline mode, local stat saves.
+7. Multiplayer match making and ranking system.
 
 ## technologies
 
