@@ -9,6 +9,28 @@ export default mergeConfig(
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
+      coverage: {
+        include: ['src'],
+        exclude: [
+          'src/types',
+          'src/**/*.test.ts',
+          // tested in e2e
+          'src/App.vue',
+          'src/env.ts',
+          'src/main.ts',
+          'src/wasm.ts',
+          'src/stores/game.ts',
+          'src/views/GameView.vue',
+        ],
+        thresholds: {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+        reporter: ['text', 'json-summary', 'json'],
+        reportOnFailure: true,
+      },
     },
   }),
 );

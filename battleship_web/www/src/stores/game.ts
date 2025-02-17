@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { battleshipWeb, getGameBoard, resetGame } from '@/utils/wasm';
+import { battleshipWeb, getGameBoard } from '@/wasm';
 
 export const useGameStore = defineStore('game', () => {
   const board = ref(getGameBoard(64));
@@ -26,7 +26,7 @@ export const useGameStore = defineStore('game', () => {
   };
 
   const reset = () => {
-    resetGame();
+    battleshipWeb.play_again();
     setBoardState();
   };
 

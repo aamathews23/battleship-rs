@@ -8,27 +8,64 @@ const store = useGameStore();
 
 <template>
   <main class="game-view">
-    <h1 class="game-view__heading">Battleship</h1>
-    <p class="game-view__description">Sink all the ships to win!</p>
+    <h1
+      class="game-view__heading"
+      data-ui="game-view-heading"
+    >
+      Battleship
+    </h1>
+    <p
+      class="game-view__description"
+      data-ui="game-view-description"
+    >
+      Sink all the ships to win!
+    </p>
     <section class="game-view__game">
       <template v-if="store.isEnd">
-        <h2 class="game-view__subheading">You win!</h2>
+        <h2
+          class="game-view__subheading"
+          data-ui="game-view-subheading"
+        >
+          You win!
+        </h2>
         <div class="game-view__statistics">
-          <p class="game-view__stat"># of turns: {{ store.amtOfTurns }}</p>
-          <p class="game-view__stat"># of hits: {{ store.amtOfHits }}</p>
-          <p class="game-view__stat"># of misses: {{ store.amtOfMisses }}</p>
-          <p class="game-view__stat"># of ships sunk: {{ store.shipsSunk }}</p>
+          <p
+            class="game-view__stat"
+            data-ui="game-view-stat-amt-of-turns"
+          >
+            # of turns: {{ store.amtOfTurns }}
+          </p>
+          <p
+            class="game-view__stat"
+            data-ui="game-view-stat-amt-of-hits"
+          >
+            # of hits: {{ store.amtOfHits }}
+          </p>
+          <p
+            class="game-view__stat"
+            data-ui="game-view-stat-amt-of-misses"
+          >
+            # of misses: {{ store.amtOfMisses }}
+          </p>
+          <p
+            class="game-view__stat"
+            data-ui="game-view-stat-ships-sunk"
+          >
+            # of ships sunk: {{ store.shipsSunk }}
+          </p>
         </div>
         <ButtonComponent @click="store.reset">Play again</ButtonComponent>
       </template>
       <div
         v-else
         class="game-view__grid"
+        data-ui="game-view-grid"
       >
         <GameSquare
           v-for="(cell, idx) in store.board"
           :key="`game-square-${idx}`"
           :variant="cell"
+          data-ui="game-view-cell"
           @click="store.shoot(idx)"
         />
       </div>

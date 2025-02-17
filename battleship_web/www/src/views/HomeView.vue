@@ -11,11 +11,24 @@ const handleOnClick = () => {
 
 <template>
   <main class="home-view">
-    <h1 class="home-view__heading">Battleship</h1>
-    <p class="home-view__description">
+    <h1
+      class="home-view__heading"
+      data-ui="home-view-heading"
+    >
+      Battleship
+    </h1>
+    <p
+      class="home-view__description"
+      data-ui="home-view-description"
+    >
       The classic game of Battleship created in Rust, Vue and Wasm.
     </p>
-    <ButtonComponent @click="handleOnClick">Play game</ButtonComponent>
+    <ButtonComponent
+      data-ui="home-view-cta"
+      @click="handleOnClick"
+    >
+      Play game
+    </ButtonComponent>
   </main>
 </template>
 
